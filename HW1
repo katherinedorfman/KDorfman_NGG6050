@@ -1,0 +1,24 @@
+Question 1: If someone gets a positive test, is it "statistically significant" at the p<0.05 level? Why or why not?
+
+A p value indicates the probability of obtaining the set of data that you got given the null hypothesis. A p value is meant to be applied to a data set, not to an individual in the data set. Therefore in this case, I don’t believe that you can apply statistical significance to an individual’s test result.
+What you should be asking in this case, is the probability of truly having an infection given a positive result. For this, you would need to calculate the positive predictive value of the test (the posterior probability), for which you would need to know the infection rate of the population (the prior probability).
+
+Question 2: What is the probability that if someone gets a positive test, that person is infected?
+
+The code was implemented in R. I did not use ChatGPT, but I did use google to figure out how to make a vector that increments by 0.1, how to round values to one decimal point, and how to view a table without seeing numbered row names.
+This code prints out a table at the end with the PPV (probability that if someone gets a positive test that that person is infected) for each of the population infection rates. You can see that as the infection rate increases, so does the PPV. A PPV of over 95% only occurs at an infection rate of 50%, which is quite a high HIV infection rate.
+
+numppl <- 1000 # number of people being sampled
+infectrate <- seq(0,1,0.1)  # infection rates
+FPrate <- 0.05 # false positive rate
+
+TP <- numppl * infectrate # number of true positives
+FP <- (numppl - TP) * FPrate # number of false positives
+PPV <- TP / (TP + FP) # positive predictive values
+PPV_percent <- PPV * 100 # probability that is someone gets a positive test, the person is infected
+PPV_percent # view output of PPV (%)
+
+PPV_percent <- round(PPV_percent, digits=1) # rount to one decimal space
+table <- data.frame(infectrate,TP,FP,PPV_percent) #create a table to view the results
+colnames(table) <- c('infection rate','true positives','false positives','PPV (%)')
+print(table,row.names=FALSE)
