@@ -1,0 +1,343 @@
+---
+title: "231002_C9FTDrnaseq_InhibitoryNeurons_findclusterres"
+output: pdf_document
+date: "1023-10-02"
+---
+
+```{r message=FALSE}
+#Clearing the workspace
+rm(list=ls())
+
+#Importing Packages
+library(tidyverse)
+library(ggplot2)
+#library(scater)
+library(ggrepel)
+library(lme4)
+library(viridis)
+library(ggrastr)
+library(networkD3)
+```
+
+```{r}
+#load data
+C9snRNAseq_InhibitoryNeurons <- read.csv("C:/Users/kesd1/Desktop/lee lab/snRNAseq/C9FTDsnRNAseqrefined_clustering_45clusters_40InNeurons_annotationsfor40clusters_groupnames.csv", header = TRUE, stringsAsFactors = FALSE)
+
+```
+
+
+```{r}
+## calcuate proportion of each cell type for 5 clusters
+C9snRNAseq_IN_5clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters)
+colnames(C9snRNAseq_IN_5clusters) <- c('group','InNeuron_5clusters')
+
+summary_table_5clusters <- C9snRNAseq_IN_5clusters %>%
+  group_by(InNeuron_5clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_5clusters[,2:4])
+Pct_C9ALS <- summary_table_5clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_5clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_5clusters$Normal/Total *100
+summary_table_5clusters <- data.frame(summary_table_5clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+```{r}
+## calcuate proportion of each cell type for 10 clusters
+C9snRNAseq_IN_10clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters)
+colnames(C9snRNAseq_IN_10clusters) <- c('group','InNeuron_10clusters')
+
+summary_table_10clusters <- C9snRNAseq_IN_10clusters %>%
+  group_by(InNeuron_10clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_10clusters[,2:4])
+Pct_C9ALS <- summary_table_10clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_10clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_10clusters$Normal/Total *100
+summary_table_10clusters <- data.frame(summary_table_10clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+```{r}
+## calcuate proportion of each cell type for 15 clusters
+C9snRNAseq_IN_15clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters)
+colnames(C9snRNAseq_IN_15clusters) <- c('group','InNeuron_15clusters')
+
+summary_table_15clusters <- C9snRNAseq_IN_15clusters %>%
+  group_by(InNeuron_15clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_15clusters[,2:4])
+Pct_C9ALS <- summary_table_15clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_15clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_15clusters$Normal/Total *100
+summary_table_15clusters <- data.frame(summary_table_15clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+
+```{r}
+## calcuate proportion of each cell type for 20 clusters
+C9snRNAseq_IN_20clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters)
+colnames(C9snRNAseq_IN_20clusters) <- c('group','InNeuron_20clusters')
+
+summary_table_20clusters <- C9snRNAseq_IN_20clusters %>%
+  group_by(InNeuron_20clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_20clusters[,2:4])
+Pct_C9ALS <- summary_table_20clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_20clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_20clusters$Normal/Total *100
+summary_table_20clusters <- data.frame(summary_table_20clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+
+```{r}
+## calcuate proportion of each cell type for 25 clusters
+C9snRNAseq_IN_25clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters)
+colnames(C9snRNAseq_IN_25clusters) <- c('group','InNeuron_25clusters')
+
+summary_table_25clusters <- C9snRNAseq_IN_25clusters %>%
+  group_by(InNeuron_25clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_25clusters[,2:4])
+Pct_C9ALS <- summary_table_25clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_25clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_25clusters$Normal/Total *100
+summary_table_25clusters <- data.frame(summary_table_25clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+
+```{r}
+## calcuate proportion of each cell type for 30 clusters
+C9snRNAseq_IN_30clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters)
+colnames(C9snRNAseq_IN_30clusters) <- c('group','InNeuron_30clusters')
+
+summary_table_30clusters <- C9snRNAseq_IN_30clusters %>%
+  group_by(InNeuron_30clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_30clusters[,2:4])
+Pct_C9ALS <- summary_table_30clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_30clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_30clusters$Normal/Total *100
+summary_table_30clusters <- data.frame(summary_table_30clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+```{r}
+## calcuate proportion of each cell type for 35 clusters for each sample
+C9snRNAseq_IN_35clusters_samp <- data.frame(C9snRNAseq_InhibitoryNeurons$sample,C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters)
+colnames(C9snRNAseq_IN_35clusters_samp) <- c('sample','InNeuron_35clusters')
+
+summary_table_35clusters_samp <- C9snRNAseq_IN_35clusters_samp %>%
+  group_by(InNeuron_35clusters, sample) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = sample, values_from = Count, values_fill = 0)
+
+# calculate percentages of cells for each sample for each cluster
+Total <- rowSums(summary_table_35clusters_samp[,-1])
+Pct_C9ALS1 <- summary_table_35clusters_samp$`C9ALS1`/Total *100
+Pct_C9ALS2 <- summary_table_35clusters_samp$`C9ALS2`/Total *100
+Pct_C9ALS3 <- summary_table_35clusters_samp$`C9ALS3`/Total *100
+Pct_C9FTD1F <- summary_table_35clusters_samp$`C9FTD1F`/Total *100
+Pct_C9FTD1M <- summary_table_35clusters_samp$`C9FTD1M`/Total *100
+Pct_C9FTD2F <- summary_table_35clusters_samp$`C9FTD2F`/Total *100
+Pct_C9FTD2M <- summary_table_35clusters_samp$`C9FTD2M`/Total *100
+Pct_C9FTD3F <- summary_table_35clusters_samp$`C9FTD3F`/Total *100
+Pct_C9FTD3M <- summary_table_35clusters_samp$`C9FTD3M`/Total *100
+Pct_C9FTD4F <- summary_table_35clusters_samp$`C9FTD4F`/Total *100
+Pct_C9FTD4M <- summary_table_35clusters_samp$`C9FTD4M`/Total *100
+Pct_C9FTD5F <- summary_table_35clusters_samp$`C9FTD5F`/Total *100
+Pct_C9FTD5M <- summary_table_35clusters_samp$`C9FTD5M`/Total *100
+Pct_Ctrl1F <- summary_table_35clusters_samp$Ctrl1F/Total *100
+Pct_Ctrl1M <- summary_table_35clusters_samp$Ctrl1M/Total *100
+Pct_Ctrl2F <- summary_table_35clusters_samp$Ctrl2F/Total *100
+Pct_Ctrl2M <- summary_table_35clusters_samp$Ctrl2M/Total *100
+Pct_Ctrl3F <- summary_table_35clusters_samp$Ctrl3F/Total *100
+Pct_Ctrl3M <- summary_table_35clusters_samp$Ctrl3M/Total *100
+Pct_Ctrl4F <- summary_table_35clusters_samp$Ctrl4F/Total *100
+Pct_Ctrl4M <- summary_table_35clusters_samp$Ctrl4M/Total *100
+Pct_Ctrl5F <- summary_table_35clusters_samp$Ctrl5F/Total *100
+Pct_Ctrl5M <- summary_table_35clusters_samp$Ctrl5M/Total *100
+
+# calculate the mean and standard deviations across samples for each cluster
+summary_table_35clusters_samp_sum <- data.frame(summary_table_35clusters_samp, Total,Pct_C9ALS1,Pct_C9ALS2,Pct_C9ALS3,Pct_C9FTD1F,Pct_C9FTD1M,Pct_C9FTD2F,Pct_C9FTD2M,Pct_C9FTD3F,Pct_C9FTD3M,Pct_C9FTD4F,Pct_C9FTD4M,Pct_C9FTD5F,Pct_C9FTD5M,Pct_Ctrl1F,Pct_Ctrl1M,Pct_Ctrl2F,Pct_Ctrl2M,Pct_Ctrl3F,Pct_Ctrl3M,Pct_Ctrl4F,Pct_Ctrl4M,Pct_Ctrl5F,Pct_Ctrl5M)
+
+summary_table_35clusters_samp_sum$ave_pct_C9ALS <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_C9ALS1','Pct_C9ALS2','Pct_C9ALS3')])
+summary_table_35clusters_samp_sum$stdev_pct_C9ALS <- apply(summary_table_35clusters_samp_sum[,c('Pct_C9ALS1','Pct_C9ALS2','Pct_C9ALS3')], 1, function(x) sqrt(var(x)))
+
+summary_table_35clusters_samp_sum$ave_pct_C9FTD <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_C9FTD1F','Pct_C9FTD1M','Pct_C9FTD2F','Pct_C9FTD2M','Pct_C9FTD3F','Pct_C9FTD3M','Pct_C9FTD4F','Pct_C9FTD4M','Pct_C9FTD5F','Pct_C9FTD5M')])
+summary_table_35clusters_samp_sum$stdev_pct_C9FTD <- apply(summary_table_35clusters_samp_sum[,c('Pct_C9FTD1F','Pct_C9FTD1M','Pct_C9FTD2F','Pct_C9FTD2M','Pct_C9FTD3F','Pct_C9FTD3M','Pct_C9FTD4F','Pct_C9FTD4M','Pct_C9FTD5F','Pct_C9FTD5M')], 1, function(x) sqrt(var(x)))
+
+summary_table_35clusters_samp_sum$ave_pct_ctrl <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_Ctrl1F','Pct_Ctrl1M','Pct_Ctrl2F','Pct_Ctrl2M','Pct_Ctrl3F','Pct_Ctrl3M','Pct_Ctrl4F','Pct_Ctrl4M','Pct_Ctrl5F','Pct_Ctrl5M')])
+summary_table_35clusters_samp_sum$stdev_pct_ctrl <- apply(summary_table_35clusters_samp_sum[,c('Pct_Ctrl1F','Pct_Ctrl1M','Pct_Ctrl2F','Pct_Ctrl2M','Pct_Ctrl3F','Pct_Ctrl3M','Pct_Ctrl4F','Pct_Ctrl4M','Pct_Ctrl5F','Pct_Ctrl5M')], 1, function(x) sqrt(var(x)))
+     
+
+# normalize each sample percentage in each cluster to the overall percentage of that sample in the dataset                              
+totcells <- sum(summary_table_35clusters_samp_sum$Total)
+summary_table_35clusters_samp_sum$'Pct_C9ALS1_norm' <- summary_table_35clusters_samp_sum$`Pct_C9ALS1` - (sum(summary_table_35clusters_samp_sum$'C9ALS1')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9ALS1')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9ALS2_norm' <- summary_table_35clusters_samp_sum$`Pct_C9ALS2` - (sum(summary_table_35clusters_samp_sum$'C9ALS2')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9ALS2')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9ALS3_norm' <- summary_table_35clusters_samp_sum$`Pct_C9ALS3` - (sum(summary_table_35clusters_samp_sum$'C9ALS3')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9ALS3')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD1F_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD1F` - (sum(summary_table_35clusters_samp_sum$'C9FTD1F')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD1F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD1M_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD1M` - (sum(summary_table_35clusters_samp_sum$'C9FTD1M')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD1M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD2F_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD2F` - (sum(summary_table_35clusters_samp_sum$'C9FTD2F')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD2F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD2M_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD2M` - (sum(summary_table_35clusters_samp_sum$'C9FTD2M')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD2M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD3F_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD3F` - (sum(summary_table_35clusters_samp_sum$'C9FTD3F')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD3F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD3M_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD3M` - (sum(summary_table_35clusters_samp_sum$'C9FTD3M')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD3M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD4F_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD4F` - (sum(summary_table_35clusters_samp_sum$'C9FTD4F')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD4F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD4M_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD4M` - (sum(summary_table_35clusters_samp_sum$'C9FTD4M')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD4M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD5F_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD5F` - (sum(summary_table_35clusters_samp_sum$'C9FTD5F')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD5F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_C9FTD5M_norm' <- summary_table_35clusters_samp_sum$`Pct_C9FTD5M` - (sum(summary_table_35clusters_samp_sum$'C9FTD5M')/totcells * 100)/(sum(summary_table_35clusters_samp$'C9FTD5M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl1F_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl1F` - (sum(summary_table_35clusters_samp_sum$'Ctrl1F')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl1F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl1M_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl1M` - (sum(summary_table_35clusters_samp_sum$'Ctrl1M')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl1M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl2F_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl2F` - (sum(summary_table_35clusters_samp_sum$'Ctrl2F')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl2F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl2M_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl2M` - (sum(summary_table_35clusters_samp_sum$'Ctrl2M')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl2M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl3F_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl3F` - (sum(summary_table_35clusters_samp_sum$'Ctrl3F')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl3F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl3M_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl3M` - (sum(summary_table_35clusters_samp_sum$'Ctrl3M')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl3M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl4F_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl4F` - (sum(summary_table_35clusters_samp_sum$'Ctrl4F')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl4F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl4M_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl4M` - (sum(summary_table_35clusters_samp_sum$'Ctrl4M')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl4M')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl5F_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl5F` - (sum(summary_table_35clusters_samp_sum$'Ctrl5F')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl5F')/totcells * 100)
+
+summary_table_35clusters_samp_sum$'Pct_Ctrl5M_norm' <- summary_table_35clusters_samp_sum$`Pct_Ctrl5M` - (sum(summary_table_35clusters_samp_sum$'Ctrl5M')/totcells * 100)/(sum(summary_table_35clusters_samp$'Ctrl5M')/totcells * 100)
+
+# calculate standard deviations for normalized percent cell counts
+summary_table_35clusters_samp_sum$ave_pct_C9ALS_norm <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_C9ALS1_norm','Pct_C9ALS2_norm','Pct_C9ALS3_norm')])
+summary_table_35clusters_samp_sum$stdev_pct_C9ALS_norm <- apply(summary_table_35clusters_samp_sum[,c('Pct_C9ALS1_norm','Pct_C9ALS2_norm','Pct_C9ALS3_norm')], 1, function(x) sqrt(var(x)))
+
+summary_table_35clusters_samp_sum$ave_pct_C9FTD_norm <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_C9FTD1F_norm','Pct_C9FTD1M_norm','Pct_C9FTD2F_norm','Pct_C9FTD2M_norm','Pct_C9FTD3F_norm','Pct_C9FTD3M_norm','Pct_C9FTD4F_norm','Pct_C9FTD4M_norm','Pct_C9FTD5F_norm','Pct_C9FTD5M_norm')])
+summary_table_35clusters_samp_sum$stdev_pct_C9FTD_norm <- apply(summary_table_35clusters_samp_sum[,c('Pct_C9FTD1F_norm','Pct_C9FTD1M_norm','Pct_C9FTD2F_norm','Pct_C9FTD2M_norm','Pct_C9FTD3F_norm','Pct_C9FTD3M_norm','Pct_C9FTD4F_norm','Pct_C9FTD4M_norm','Pct_C9FTD5F_norm','Pct_C9FTD5M_norm')], 1, function(x) sqrt(var(x)))
+
+summary_table_35clusters_samp_sum$ave_pct_ctrl_norm <- rowMeans(summary_table_35clusters_samp_sum[,c('Pct_Ctrl1F_norm','Pct_Ctrl1M_norm','Pct_Ctrl2F_norm','Pct_Ctrl2M_norm','Pct_Ctrl3F_norm','Pct_Ctrl3M_norm','Pct_Ctrl4F_norm','Pct_Ctrl4M_norm','Pct_Ctrl5F_norm','Pct_Ctrl5M_norm')])
+summary_table_35clusters_samp_sum$stdev_pct_ctrl_norm <- apply(summary_table_35clusters_samp_sum[,c('Pct_Ctrl1F_norm','Pct_Ctrl1M_norm','Pct_Ctrl2F_norm','Pct_Ctrl2M_norm','Pct_Ctrl3F_norm','Pct_Ctrl3M_norm','Pct_Ctrl4F_norm','Pct_Ctrl4M_norm','Pct_Ctrl5F_norm','Pct_Ctrl5M_norm')], 1, function(x) sqrt(var(x)))
+
+## make plots
+summary_table_35clusters_samp_sum$cluster_num <- c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35)
+
+## make box plots
+library(MASS) 
+library(reshape2) 
+library(reshape) 
+
+data <- data.frame(celltype,geneA,geneB,geneC)
+boxplot(geneA ~ celltype)
+# celltype: replace with InNeuron_35clusters
+
+
+data <- melt(data, id="celltype")
+
+ggplot(data, aes(x = celltype, y = value, color = variable)) +
+  geom_boxplot()
+
+
+# make violin plots
+ggplot(data, aes(x=cluster_num, y=neuron_prop, fill=genotype)) +
+  geom_violin()
+
+data <- summary_table_35clusters_samp_sum[,c('cluster_num','Pct_Ctrl1F_norm','Pct_Ctrl1M_norm','Pct_Ctrl2F_norm','Pct_Ctrl2M_norm','Pct_Ctrl3F_norm','Pct_Ctrl3M_norm','Pct_Ctrl4F_norm','Pct_Ctrl4M_norm','Pct_Ctrl5F_norm','Pct_Ctrl5M_norm','Pct_C9ALS1_norm','Pct_C9ALS2_norm','Pct_C9ALS3_norm','Pct_C9FTD1F_norm','Pct_C9FTD1M_norm','Pct_C9FTD2F_norm','Pct_C9FTD2M_norm','Pct_C9FTD3F_norm','Pct_C9FTD3M_norm','Pct_C9FTD4F_norm','Pct_C9FTD4M_norm','Pct_C9FTD5F_norm','Pct_C9FTD5M_norm')]
+
+data <- melt(data, id="celltype")
+
+
+  
+## plot proportion of each cell type for 35 clusters
+ggplot(data  = summary_table_35clusters_samp_sum,
+       aes(x = cluster_num,
+           y = ave_pct_C9ALS_norm),
+       title = '35 clusters')+
+  geom_point(size     = 1.2,
+             alpha    = .8,
+             position = "jitter")+ #to add some random noise for plotting purposes
+  ylim(-50, 50) +
+  theme_minimal()
+
+
+```
+
+
+```{r}
+## calcuate proportion of each cell type for 35 clusters
+C9snRNAseq_IN_35clusters <- data.frame(C9snRNAseq_InhibitoryNeurons$group,C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters)
+colnames(C9snRNAseq_IN_35clusters) <- c('group','InNeuron_35clusters')
+
+summary_table_35clusters <- C9snRNAseq_IN_35clusters %>%
+  group_by(InNeuron_35clusters, group) %>%
+  summarize(Count = n()) %>%
+  pivot_wider(names_from = group, values_from = Count, values_fill = 0)
+
+Total <- rowSums(summary_table_35clusters[,2:4])
+Pct_C9ALS <- summary_table_35clusters$`C9-ALS`/Total *100
+Pct_C9FTD <- summary_table_35clusters$`C9-FTD`/Total *100
+Pct_Normal <- summary_table_35clusters$Normal/Total *100
+summary_table_35clusters <- data.frame(summary_table_35clusters, Total,Pct_C9ALS,Pct_C9FTD,Pct_Normal)
+
+
+```
+
+```{r}
+## plot proportion of each cell type for 35 clusters
+ggplot(data  = summary_table_35clusters,
+       aes(x = InNeuron_35clusters,
+           y = Pct_C9ALS),
+       title = '35 clusters')+
+  geom_point(size     = 1.2,
+             alpha    = .8,
+             position = "jitter")+ #to add some random noise for plotting purposes
+  ylim(0, 100) +
+  theme_minimal()
+
+```
+
+```{r}
+## save as csv
+library(writexl)
+sheets <- list("5clusters" = summary_table_5clusters, 
+               "10clusters" = summary_table_10clusters,
+               "15clusters" = summary_table_15clusters,
+               "20clusters" = summary_table_20clusters,
+               "25clusters" = summary_table_25clusters,
+               "30clusters" = summary_table_30clusters,
+               "35clusters" = summary_table_35clusters)
+write_xlsx(sheets, "C:/Users/kesd1/Desktop/lee lab/snRNAseq/C9FTDsnRNAseqrefined_clustering_45clusters_40InNeurons_genotypecounts.csv")
+
+```
+

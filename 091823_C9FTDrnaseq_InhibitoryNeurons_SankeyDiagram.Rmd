@@ -1,0 +1,651 @@
+---
+title: "C9FTDsnRNAseq_InhibitoryNeuronsSankey"
+output: pdf_document
+date: "2023-09-27"
+---
+
+```{r message=FALSE}
+#Clearing the workspace
+rm(list=ls())
+
+#Importing Packages
+library(tidyverse)
+library(ggplot2)
+#library(scater)
+library(ggrepel)
+library(lme4)
+library(viridis)
+library(ggrastr)
+```
+
+```{r}
+library(networkD3)
+#SankeyDiagram of Cluster Progression
+C9snRNAseq_InhibitoryNeurons <- read.csv("C:/Users/kesd1/Desktop/lee lab/snRNAseq/C9FTDsnRNAseqrefined_clustering_45clusters_40InNeurons_annotationsfor40clusters.csv", header = TRUE, stringsAsFactors = FALSE)
+
+```
+
+
+## rename all of the clusters
+```{r}
+# rename clusters: switch from number of cluster to name
+C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters==0]<-"CHRM2+LGR5+LHX6+CDH12+"
+C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters==1]<-'TYR+GGH+CCDC184+ADARB2+VIP+CBLN1+CASC6+LGR5+CHRM2+HS3ST3A1+CHRNA4+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters==2]<-"LAMP5+ADARB2+TNFAIP8L3+CDH12+NMBR+LCP2+CHRNA4+"
+C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters==3]<-'TNFAIP8L3+LAMP5+CA1+ADARB2+CPRM1+NPY+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters==4]<-'SCUBE3+LHX6+B3GAT2+CDH12+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==0]<-'CDH12+CHRM2+LBH+LHX6+LGR5+MEPE+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==1]<-'CDH12+ADARB2+VIP+HS3ST3A1+TYR+CHRM2+CBLN1+CCDC184+GGH+CASC6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==2]<-'LGR5+LHX6+STK32A+CALB1+ADGRG6+GXYLT2+B3GAT2+HPGD+OPRM1+CHRM2+ADAMTSL1+SST+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==3]<-'CDH12+TNFAIP8L3+NMBR+CHRNA4+ADARB2+ADAMTSL1+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==4]<-'CDH12+CHRM2+SPAG17+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==5]<-'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+SYT6+CHRNA6+CHRM2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==6]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==7]<-'SULF1+LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==8]<-'CDH12+SPAG17+CALB1+LHX6+SCUBE3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters==9]<-'SULF1+LHX6+NPY+CHRM2+ADAMTSL1+SST+ADARB2+CDH12+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==0]<-'CDH12+LHX6+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==1]<-'LGR5+MEPE+WFDC2+SULF1+LHX6+CHRM2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==2]<-'CDH12+ADARB2+VIP+HS3ST3A1+GGH+CHRM2+CBLN1+CCDC184+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==3]<-'LHX6+CALB1+ADGRG6+FRZB+GXYLT2+HPGD+CHRM2+ADAMTSL1+PENK+SST+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==4]<-'SST+CHRM2+OPRM1+GXYLT2+B3GAT2+HPGD+STK32A+ADGRG6+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==5]<-'LGR5+CASC6+SPAG17+OPRM1+CCDC184+CBLN1+CHRM2+HS3STSA1+CHRNA6+VIP+CLP2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==6]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==7]<-'HPGD+CHRNA6+MC4R+ADARB2+CHRNA4+NMBR+CDH12+TNFAIP8L3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==8]<-'ADARB2+VIP+ADAMTSL1+PENK+TYR+GGH+CASC6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==9]<-'LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==10]<-'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+SYT6+CHRNA6+CHRM2+GXYLT2+B2GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==11]<-'SCUBE3+LHX6+CALB1+B3GAT2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==12]<-'CHRM2+SPAG17+HPGD+LHX6+GLP1R+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==13]<-'ADAMTSL1+CDH12+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters==14]<-'LHX6+GXYLT2+B3GAT2+CHRM2+PENK+CDH12+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==0]<-'CDH12+LHX6+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==1]<-'CDH12+SST+OPRM1+B3GAT2+GXYLT2+ADGRG6+STK32A+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==2]<-'B3GAT2+ADARB2+LCP2+TNFAIP8L3+LAMP5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==3]<-'CDH12+NMBR+CHRNA4+ADARB2+MC4R+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==4]<-'CASC6+GGH+CBLN1+HS3ST3A1+TYR+VIP+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==5]<-'CDH12+LHX6+LGR5+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==6]<-'WFDC2+LHX6+CALB1+FRZB+HPGD+PENK+ADAMTSL1+MC4R+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==7]<-'CDH12+ADARB2+CHRM2+CBLN1+CCDC184+GGH+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==8]<-'LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+TNFAIP8L3+LAMP5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==9]<-'ADARB2+VIP+ADAMTSL1+PENK+TYR+GGH+CASC6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==10]<-'LGR5+CASC6+SPAG17+OPRM1+CBLN1+CCDC184+CHRNA6+VIP+ADARB2+LCP2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==11]<-'CDH12+B3GAT2+CALB1+LHX6+SCUBE3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==12]<-'LHX6+HPGD+B3GAT2+OPRM1+SST+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==13]<-'CDH12+LBH+LHX6+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==14]<-'LGR5+LHX6+HPGD+CHRM2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==15]<-'PAX6+CDH12+TNFAIP8L3+ADARB2+SYT6+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==16]<-'LHX6+ADARB2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==17]<-'ADAMTSL1+CHRM2+LHX6+LGR5+MEPE+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==18]<-'LHX6+B3GAT2+GXYLT2+PENK+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters==19]<-'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+CHRM2+B3GAT2+GXYLT2+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==0]<-'CDH12+LHX6+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==1]<-'CHRM2+LHX6+SULF1+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==2]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==3]<-'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==4]<-'CDH12+ADAMTSL1+PENK+FRZB+CALB1+LHX6+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==5]<-'CDH12+ADARB2+CHRM2+CCDC184+GGH+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==6]<-'CHD12+SST+CHRM2+OPRM1+GXYLT2+ADGRG6+CALB1+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==7]<-'PAX6+LCP2+ADARB2+VIP+CHRNA6+CCDC184+CASC6+SPAG17+OPRM1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==8]<-'CDH12+B3GAT1+CALB1+LHX6+SCUBE3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==9]<-'CDH12+ADARB2+VIP+HS3ST3A1+GGH+CBLN1+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==10]<-'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==11]<-'CDH12+SST+CHRM2+OPRM1+B3GAT2+HPGD+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==12]<-'LGR5+LHX6+STK32A+ADGRG6+GXYLT2+B3GAT2+OPRM1+SST+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==13]<-'CDH12+DBP+LBH+LHX6+PVALB+SULF1+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==14]<-'ADARB2+VIP+HS3ST3A1+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==15]<-'CHD12+CHRM2+SPAG17+LHX6+GLP1R+'
+ C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==16]<-'ADARB2+VIP+CHRNA6+TYR+CCDC184+GGH+CASC6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==17]<-'LAMP5+NMBR+CHRNA4+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==18]<-'CASC6+GGH+PENK+ADAMTSL1+VIP+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==19]<-'PAX6+TNFAIP8L3+CHRNA4+ADARB2+VIP+SYT6+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==20]<-'LHX6+GXYLT2+B3GAT2+CHRM2+PENK+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==21]<-'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+CHRM2+GXYLT2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==22]<-'CDH12+ADARB2+ADAMTSL1+OPRM1+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==23]<-'LHX6+ADGRG6+NPY+OPRM1+CHRM2+PENK+ADAMTSL1+SST+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters==24]<-'CDH12+ADARB2+CHRNA6+GXYLT2+LGR5+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==0]<-'CDH12+CHRM2+LBH+LHX6+SULF1+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==1]<-'CDH12+LBH+LHX6+SULF1+WFDC2+_1'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==2]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==3]<-'LHX6+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==4]<-'CDH12+SST+CHRM2+OPRM1+GXYLT2+ADGRG6+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==5]<-'SCUBE3+LHX6+B3GAT2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==6]<-'CDH12+ADARB2+VIP+GGH+CCDC184+CBLN1+CHRM2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==7]<-'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==8]<-'CASC6+GGH+CBLN1+HS3ST3A1+VIP+ADARB2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==9]<-'PAX6+LCP2+ADARB2+VIP+CHRNA6+CBLN1+CCDC184+CASC6+SPAG17+OPRM1+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==10]<-'CDH12+SST+ADAMTSL1+PENK+FRZB+CALB1+LHX6+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==11]<-'SST+OPRM1+GXYLT2+B3GAT2+STK32A+ADGRG6+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==12]<-'CDH12+LBH+LHX6+SULF1+WFDC2+_2'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==13]<-'CDH12+CCDC184+LBH+LHX6+WFDC2+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==14]<-'ADARB2+VIP+HS3ST3A1+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==15]<-'CDH12+LHX6+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==16]<-'CDH12+SST+CHRM2+OPRM1+HPGD+B3GAT2+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==17]<-'LAMP5+NMBR+CHRNA4+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==18]<-'ADARB2+VIP+CHRNA6+TYR+GGH+CBLN1+CASC6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==19]<-'CHRNA6+ADARB2+VIP+PENK+ADAMTSL1+GGH+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==20]<-'CHRNA6+VIP+ADARB2+PAX6+TNFAIP8L3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==21]<-'CHRM2+SPAG17+LHX6+GLP1R+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==22]<-'LHX6+GXYLT2+CHRM2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==23]<-'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+CHRM2+B3GAT2+GXYLT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==24]<-'LHX6+TH+SST+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==25]<-'TNFAIP8L3+ADARB2+CHRNA4+CHRNA6+CASC6+HPGD+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==26]<-'CDH12+ADARB2+ADAMTSL1+OPRM1+LHX6+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==27]<-'CDH12+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==28]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+LCP2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters==29]<-'CDH12+SST+ADAMTSL1+PENK+CHRM2+OPRM1+NPY+ADGRG6+LHX6+'
+
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==0]<-'CDH12+CHRM2+LBH+LHX6+SULF1+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==1]<-'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==2]<-'CDH12+LHX6+SULF1+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==3]<-'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==4]<-'CDH12+SST+CHRM2+OPRM1+GXYLT2+CALB1+ADGRG6+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==5]<-'CDH12+LBH+LHX6+SULF1+WFDC2+_3'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==6]<-'CDH12+B3GAT2+CALB1+LHX6+SCUBE3+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==7]<-'CASC6+GGH+CBLN1+HS3ST3A1+VIP+ADARB2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==8]<-'CDH12+ADARB2+VIP+CRHM2+CBLN1+CCDC184+GGH+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==9]<-'CDH12+SST+ADAMTSL1+PENK+HPGD+CALB1+FRZB+LHX6+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==10]<-'CDH12+LBH+LHX6+WFDC2+SULF1+_1'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==11]<-'PAX6+LCP2+ADARB2+VIP+CHRNA6+QPCT+CCDC184+CBLN1+CHRM2+CASC6+SPAG17+OPRM1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==12]<-'SST+OPRM1+B3GAT2+GXYLT2+STK32A+ADGRG6+LHX6+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==13]<-'ADARB2+VIP+HS3ST3A1+CBLN1+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==14]<-'CDH12+SST+CHRM2+OPRM1+HPGD+B3GAT2+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==15]<-'LAMP5+NMBR+ADARB2+SERPINF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==16]<-'CDH12+TNFAIP8L3+ADARB2+SYT6+ADAMTSL1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==17]<-'CHRM2+SPAG17+LHX6+GLP1R+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==18]<-'CDH12+LBH+LHX6+WFDC2+SULF1+_2'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==19]<-'PAX6+TNFAIP8L3+CHRNA4+ADARB2+TSAN12+SYT6+VIP+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==20]<-'LHX6+GXYLT2+CHRM2+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==21]<-'ADARB2+VIP+PENK+ADAMTSL1+GGH+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==22]<-'ADARB2+VIP+CHRNA6+TYR+GGH+CASC6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==23]<-'CDH12+FRZB+CALB1+LHX6+WFDC2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==24]<-'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==25]<-'PAX6+CHD12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+CHRM2+B3GAT2+GXYLT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==26]<-'LGR5+CASC6+GGH+CCDC184+CBLN1+SERPINF1+CHRNA6+ADARB2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==27]<-'ADARB2+CHRNA6+CASC6+HPGD+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==28]<-'LHX6+TH+SST+CDH12+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==29]<-'CDH12+ADARB2+ADAMTSL1+LHX6+SULF1+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==30]<-'ADARB2+LGR5+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==31]<-'CDH12+DBP+QPCT+CHRM2+OPRM1+GXYLT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==32]<-'TNFAIP8L3+LAMP5+DBP+LCP2+ADARB2+B3GAT2+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==33]<-'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+'
+C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters[C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters==34]<-'CDH12+SST+PENK+CHRM2+NPY+LHX6+'
+
+```
+
+
+# make as factor
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_35ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters, levels = 
+                                                                    c( "CDH12+CHRM2+LBH+LHX6+SULF1+WFDC2+",
+ "TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+",
+ "CDH12+LHX6+SULF1+WFDC2+",
+ 'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+SULF1+',
+ 'CDH12+SST+CHRM2+OPRM1+GXYLT2+CALB1+ADGRG6+LHX6+',
+ 'CDH12+LBH+LHX6+SULF1+WFDC2+_1',
+ 'CDH12+B3GAT2+CALB1+LHX6+SCUBE3+',
+ 'CASC6+GGH+CBLN1+HS3ST3A1+VIP+ADARB2+CDH12+',
+ 'CDH12+ADARB2+VIP+CRHM2+CBLN1+CCDC184+GGH+',
+ 'CDH12+SST+ADAMTSL1+PENK+HPGD+CALB1+FRZB+LHX6+WFDC2+',
+  'CDH12+LBH+LHX6+WFDC2+SULF1+_1',
+ 'PAX6+LCP2+ADARB2+VIP+CHRNA6+QPCT+CCDC184+CBLN1+CHRM2+CASC6+SPAG17+OPRM1+',
+ 'SST+OPRM1+B3GAT2+GXYLT2+STK32A+ADGRG6+LHX6+LGR5+',
+ 'ADARB2+VIP+HS3ST3A1+CBLN1+CASC6+',
+ 'CDH12+SST+CHRM2+OPRM1+HPGD+B3GAT2+LHX6+',
+ 'LAMP5+NMBR+ADARB2+SERPINF1+',
+ 'CDH12+TNFAIP8L3+ADARB2+SYT6+ADAMTSL1+',
+ 'CHRM2+SPAG17+LHX6+GLP1R+LGR5+',
+'CDH12+LBH+LHX6+WFDC2+SULF1+_2',
+ 'PAX6+TNFAIP8L3+CHRNA4+ADARB2+TSAN12+SYT6+VIP+CHRNA6+',
+ 'LHX6+GXYLT2+CHRM2+CDH12+',
+ 'ADARB2+VIP+PENK+ADAMTSL1+GGH+CASC6+',
+ 'ADARB2+VIP+CHRNA6+TYR+GGH+CASC6+',
+ 'CDH12+FRZB+CALB1+LHX6+WFDC2+',
+'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+',
+'PAX6+CHD12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+CHRM2+B3GAT2+GXYLT2+',
+ 'LGR5+CASC6+GGH+CCDC184+CBLN1+SERPINF1+CHRNA6+ADARB2+',
+'ADARB2+CHRNA6+CASC6+HPGD+',
+'LHX6+TH+SST+CDH12+',
+'CDH12+ADARB2+ADAMTSL1+LHX6+SULF1+',
+'ADARB2+LGR5+',
+ 'CDH12+DBP+QPCT+CHRM2+OPRM1+GXYLT2+',
+'TNFAIP8L3+LAMP5+DBP+LCP2+ADARB2+B3GAT2+',
+'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+',
+'CDH12+SST+PENK+CHRM2+NPY+LHX6+'))
+                                                                                                                                    
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_30ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters, levels = 
+                                                                    
+ c('CDH12+CHRM2+LBH+LHX6+SULF1+LGR5+',
+'CDH12+LBH+LHX6+SULF1+WFDC2+_1',
+'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+',
+'LHX6+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+',
+'CDH12+SST+CHRM2+OPRM1+GXYLT2+ADGRG6+LHX6+LGR5+',
+'SCUBE3+LHX6+B3GAT2+CDH12+',
+'CDH12+ADARB2+VIP+GGH+CCDC184+CBLN1+CHRM2+',
+'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+',
+'CASC6+GGH+CBLN1+HS3ST3A1+VIP+ADARB2+CDH12+',
+'PAX6+LCP2+ADARB2+VIP+CHRNA6+CBLN1+CCDC184+CASC6+SPAG17+OPRM1+LGR5+',
+'CDH12+SST+ADAMTSL1+PENK+FRZB+CALB1+LHX6+WFDC2+',
+'SST+OPRM1+GXYLT2+B3GAT2+STK32A+ADGRG6+LHX6+LGR5+',
+'CDH12+LBH+LHX6+SULF1+WFDC2+_2',
+'CDH12+CCDC184+LBH+LHX6+WFDC2+SULF1+',
+'ADARB2+VIP+HS3ST3A1+CASC6+',
+'CDH12+LHX6+WFDC2+',
+'CDH12+SST+CHRM2+OPRM1+HPGD+B3GAT2+LHX6+',
+'LAMP5+NMBR+CHRNA4+ADARB2+',
+'ADARB2+VIP+CHRNA6+TYR+GGH+CBLN1+CASC6+LGR5+',
+'CHRNA6+ADARB2+VIP+PENK+ADAMTSL1+GGH+CASC6+',
+'CHRNA6+VIP+ADARB2+PAX6+TNFAIP8L3+',
+'CHRM2+SPAG17+LHX6+GLP1R+LGR5+',
+'LHX6+GXYLT2+CHRM2+CDH12+',
+'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+CHRM2+B3GAT2+GXYLT2+',
+'LHX6+TH+SST+CDH12+',
+'TNFAIP8L3+ADARB2+CHRNA4+CHRNA6+CASC6+HPGD+',
+'CDH12+ADARB2+ADAMTSL1+OPRM1+LHX6+SULF1+',
+'CDH12+ADARB2+',
+'TNFAIP8L3+LAMP5+LCP2+ADARB2+LCP2+B3GAT2+',
+'CDH12+SST+ADAMTSL1+PENK+CHRM2+OPRM1+NPY+ADGRG6+LHX6+'
+))                                                                
+
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_25ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters, levels = 
+  
+ c('CDH12+LHX6+WFDC2+SULF1+',
+'CHRM2+LHX6+SULF1+WFDC2+',
+'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+',
+'TNFAIP8L3+LAMP5+CA1+ADARB2+OPRM1+CALB1+ADGRG6+LHX6+',
+'CDH12+ADAMTSL1+PENK+FRZB+CALB1+LHX6+WFDC2+',
+'CDH12+ADARB2+CHRM2+CCDC184+GGH+',
+'CHD12+SST+CHRM2+OPRM1+GXYLT2+ADGRG6+CALB1+LHX6+',
+'PAX6+LCP2+ADARB2+VIP+CHRNA6+CCDC184+CASC6+SPAG17+OPRM1+',
+'CDH12+B3GAT1+CALB1+LHX6+SCUBE3+',
+'CDH12+ADARB2+VIP+HS3ST3A1+GGH+CBLN1+CASC6+',
+'CDH12+TNFAIP8L3+CHRNA4+ADARB2+MC4R+CHRNA6+',
+'CDH12+SST+CHRM2+OPRM1+B3GAT2+HPGD+LHX6+',
+'LGR5+LHX6+STK32A+ADGRG6+GXYLT2+B3GAT2+OPRM1+SST+',
+'CDH12+DBP+LBH+LHX6+PVALB+SULF1+WFDC2+',
+'ADARB2+VIP+HS3ST3A1+CASC6+',
+'CHD12+CHRM2+SPAG17+LHX6+GLP1R+',
+'ADARB2+VIP+CHRNA6+TYR+CCDC184+GGH+CASC6+LGR5+',
+'LAMP5+NMBR+CHRNA4+ADARB2+',
+'CASC6+GGH+PENK+ADAMTSL1+VIP+ADARB2+',
+'PAX6+TNFAIP8L3+CHRNA4+ADARB2+VIP+SYT6+CHRNA6+',
+'LHX6+GXYLT2+B3GAT2+CHRM2+PENK+CDH12+',
+'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+CHRM2+GXYLT2+B3GAT2+',
+'CDH12+ADARB2+ADAMTSL1+OPRM1+SULF1+',
+'LHX6+ADGRG6+NPY+OPRM1+CHRM2+PENK+ADAMTSL1+SST+',
+'CDH12+ADARB2+CHRNA6+GXYLT2+LGR5+'
+))                                                                   
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_20ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters, levels = 
+          
+ c('CDH12+LHX6+WFDC2+SULF1+',
+'CDH12+SST+OPRM1+B3GAT2+GXYLT2+ADGRG6+STK32A+LHX6+LGR5+',
+'B3GAT2+ADARB2+LCP2+TNFAIP8L3+LAMP5+',
+'CDH12+NMBR+CHRNA4+ADARB2+MC4R+',
+'CASC6+GGH+CBLN1+HS3ST3A1+TYR+VIP+ADARB2+',
+'CDH12+LHX6+LGR5+WFDC2+SULF1+',
+'WFDC2+LHX6+CALB1+FRZB+HPGD+PENK+ADAMTSL1+MC4R+CDH12+',
+'CDH12+ADARB2+CHRM2+CBLN1+CCDC184+GGH+',
+'LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+TNFAIP8L3+LAMP5+',
+  'ADARB2+VIP+ADAMTSL1+PENK+TYR+GGH+CASC6+LGR5+',
+'LGR5+CASC6+SPAG17+OPRM1+CBLN1+CCDC184+CHRNA6+VIP+ADARB2+LCP2+',
+'CDH12+B3GAT2+CALB1+LHX6+SCUBE3+',
+'LHX6+HPGD+B3GAT2+OPRM1+SST+CDH12+',
+'CDH12+LBH+LHX6+WFDC2+SULF1+',
+'LGR5+LHX6+HPGD+CHRM2+CDH12+',
+'PAX6+CDH12+TNFAIP8L3+ADARB2+SYT6+CHRNA6+',
+'LHX6+ADARB2+CDH12+',
+'ADAMTSL1+CHRM2+LHX6+LGR5+MEPE+WFDC2+SULF1+',
+'LHX6+B3GAT2+GXYLT2+PENK+CDH12+',
+'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+CHRM2+B3GAT2+GXYLT2+'
+))                                                                                                                             
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_15ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters, levels = 
+                                                                  
+ c('CDH12+LHX6+WFDC2+SULF1+',
+'LGR5+MEPE+WFDC2+SULF1+LHX6+CHRM2+CDH12+',
+'CDH12+ADARB2+VIP+HS3ST3A1+GGH+CHRM2+CBLN1+CCDC184+CASC6+',
+'LHX6+CALB1+ADGRG6+FRZB+GXYLT2+HPGD+CHRM2+ADAMTSL1+PENK+SST+CDH12+',
+'SST+CHRM2+OPRM1+GXYLT2+B3GAT2+HPGD+STK32A+ADGRG6+LHX6+LGR5+',
+'LGR5+CASC6+SPAG17+OPRM1+CCDC184+CBLN1+CHRM2+HS3STSA1+CHRNA6+VIP+CLP2+',
+'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+',
+'HPGD+CHRNA6+MC4R+ADARB2+CHRNA4+NMBR+CDH12+TNFAIP8L3+',
+'ADARB2+VIP+ADAMTSL1+PENK+TYR+GGH+CASC6+LGR5+',
+'LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+',
+'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+TSPAN12+SYT6+CHRNA6+CHRM2+GXYLT2+B2GAT2+',
+'SCUBE3+LHX6+CALB1+B3GAT2+CDH12+',
+'CHRM2+SPAG17+HPGD+LHX6+GLP1R+LGR5+',
+'ADAMTSL1+CDH12+ADARB2+',
+'LHX6+GXYLT2+B3GAT2+CHRM2+PENK+CDH12+'
+ ))                                                                       
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_10ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters, levels = 
+                                                                    c(
+                                                                  'CDH12+CHRM2+LBH+LHX6+LGR5+MEPE+WFDC2+SULF1+',
+'CDH12+ADARB2+VIP+HS3ST3A1+TYR+CHRM2+CBLN1+CCDC184+GGH+CASC6+LGR5+',
+'LGR5+LHX6+STK32A+CALB1+ADGRG6+GXYLT2+B3GAT2+HPGD+OPRM1+CHRM2+ADAMTSL1+SST+CDH12+',
+'CDH12+TNFAIP8L3+NMBR+CHRNA4+ADARB2+ADAMTSL1+CHRNA6+',
+'CDH12+CHRM2+SPAG17+LHX6+LGR5+',
+'PAX6+CDH12+TNFAIP8L3+CHRNA4+ADARB2+SYT6+CHRNA6+CHRM2+',
+'TNFAIP8L3+LAMP5+LCP2+ADARB2+B3GAT2+',
+'SULF1+LHX6+CALB1+ADGRG6+OPRM1+ADARB2+CA1+LAMP5+TNFAIP8L3+',
+'CDH12+SPAG17+CALB1+LHX6+SCUBE3+',
+'SULF1+LHX6+NPY+CHRM2+ADAMTSL1+SST+ADARB2+CDH12+'
+))
+                                                                   
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons$InNeuron_5ClusterAnnotate <- factor(C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters, levels = 
+    
+c('CHRM2+LGR5+LHX6+CDH12+',
+'TYR+GGH+CCDC184+ADARB2+VIP+CBLN1+CASC6+LGR5+CHRM2+HS3ST3A1+CHRNA4+',
+'LAMP5+ADARB2+TNFAIP8L3+CDH12+NMBR+LCP2+CHRNA4+',
+'TNFAIP8L3+LAMP5+CA1+ADARB2+CPRM1+NPY+LHX6+',
+'SCUBE3+LHX6+B3GAT2+CDH12+'
+))  
+```
+
+
+```{r}
+#### save annotations as a csv
+write.csv(C9snRNAseq_InhibitoryNeurons, "C:/Users/kesd1/Desktop/lee lab/snRNAseq/C9FTDsnRNAseqrefined_clustering_45clusters_40InNeurons_annotationsfor40clusters_groupnames.csv", row.names=FALSE)
+
+```
+
+
+```{r}
+library(networkD3)
+#SankeyDiagram of Cluster Progression
+C9snRNAseq_InhibitoryNeurons <- read.csv("C:/Users/kesd1/Desktop/lee lab/snRNAseq/C9FTDsnRNAseqrefined_clustering_45clusters_40InNeurons_annotationsfor40clusters_groupnames.csv", header = TRUE, stringsAsFactors = FALSE)
+
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons_order <- C9snRNAseq_InhibitoryNeurons[order(
+  C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters,
+  C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters,
+  C9snRNAseq_InhibitoryNeurons$InNeuron_25clusters,           C9snRNAseq_InhibitoryNeurons$InNeuron_20clusters,
+  C9snRNAseq_InhibitoryNeurons$InNeuron_15clusters,
+  C9snRNAseq_InhibitoryNeurons$InNeuron_10clusters,
+  C9snRNAseq_InhibitoryNeurons$InNeuron_5clusters),]
+
+rownames(C9snRNAseq_InhibitoryNeurons_order) <- 1:nrow(C9snRNAseq_InhibitoryNeurons_order)
+```
+
+```{r}
+
+links <- data.frame(source = c(
+  paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_5clusters,'_1'), 
+  paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_10clusters,'_2'), 
+  paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_15clusters,'_3'), 
+  paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_20clusters,'_4'), 
+  paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_25clusters,'_5'), 
+  paste0(C9snRNAseq_InhibitoryNeurons$InNeuron_30clusters,'_6')),
+                    
+       target = c(
+         paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_10clusters, '_2'), 
+         paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_15clusters,'_3'), 
+         paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_20clusters,'_4'), 
+         paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_25clusters,'_5'), 
+         paste0(C9snRNAseq_InhibitoryNeurons_order$InNeuron_30clusters,'_6'), paste0(C9snRNAseq_InhibitoryNeurons$InNeuron_35clusters,'_7')))
+
+links$source <- as.character(links$source)
+links$target <- as.character(links$target)
+```
+
+```{r}
+nodes <- data.frame(name = unique(c(links$source, links$target)))
+```
+
+```{r}
+links$source <- match(links$source, nodes$name) -1
+links$target <- match(links$target, nodes$name) -1
+
+links$value <- 1
+```
+
+```{r}
+#adding colors
+
+nodes$group <- as.factor(c(
+  "brown", "red", "yellow", "green", "blue", #5 clusters
+
+  "brown", "violet", "gray", "red-orange", "red", "green", "yellow", "yellow", "lightblue", "blue", #10 clusters
+
+  "darkbrown", "lightbrown", "gold", "royalblue", "violet", "red-yellow", "gray", "red", "darkblue", "green", "lightgreen", "royalblue", "blue", 'black', "darkgray",#, #15 clusters
+
+  'violet', 'darkgreen', 'lightbrown', 'royalblue', 'brown', 'bc2', 'brown', 'red', 'red-yellow', 'violet', 'darkblue', 'green', 'royalblue', 'teal', 'lightblue', 'black', 'darkred', 'darkgray', 'orange', 'blue',  #20 clusters
+
+  'gold', 'lightbrown', 'darkgreen', 'skyblue', 'violet', 'brown', 'gray', 'black','gray','bc2', 'gold', 'royalblue', 'darkred', 'green', 'red', 'lightblue', 'teal', 'blue', 'magenta', 'orange', 'red-yellow', 'darkgray', 'lightgreen', 'violet', 'darkblue', #25 clusters
+
+  "lightblue", "violet", "violet", "red", "gold", "bluepurple", "darkred", "bc2", 'darkgreen',"green", "blue", "skyblue", "violet", "darkblue", "red-orange", "lightgreen", "brown", "lightblue", "gold", "gray", "black", "bc", "bc2", "lightred", "orange", "gray", "lightgray", "magenta", "lightblue", "red", #30 clusters
+
+  "lightblue", "bc2", "violet", "red", "gold", "lightblue", "darkred", "bc2", "darkgreen", "green", "blue", "bluegray", "gray", "violet", "darkblue", "red-orange", "lightgreen", "skyblue", "brown", "black", "gold", "gray", "black", "bc", "lightred", "lightblue", "violet", "bc2", "orange", "gray", "magenta", "lightgray", "lightblue", "red", "green" )) #35 clusters
+
+
+#colorgroups <- 'd3.scaleOrdinal() .domain(["red-orange", "red", "orange", "blue", "green", "violet", "gray", "bc", "bc2", "darkgray", "black", "magenta", "lightgreen", "darkblue", "brown", "royalblue", "gold", "lightblue", "darkgreen", "lightbrown", "yellow", "skyblue", "lightgray", "darkred", "darkbrown", "lightred"]) .range(["#ff5349", "#d62728", "#ff7f0e", "#1f77b4", "#2ca02c", "#8800ff", "#808080", "#0D98BA", "#40E0D0", "#5A5A5A", "#000000", "#FF00FF", "#90EE90", "#000080", "#964B00", "#0096FF", "#FFD700", "#ADD8E6", "#023020", "#C4A484", "#FFFF00", "#00CCFF", "#D3D3D3", "#8B0000", "#5C4033", "#ffcccb"])'
+
+
+colorgroups <- 'd3.scaleOrdinal() .domain(["red-orange", "red", "orange", "blue", "green", "violet", "gray", "bc", "bc2", "darkgray", "black", "magenta", "lightgreen", "darkblue", "brown", "royalblue", "gold", "lightblue", "darkgreen", "lightbrown", "yellow", "skyblue", "lightgray", "darkred", "darkbrown", "lightred","bluegray","teal","bluepurple"]) .range(["#ff5349", "#d62728", "#ff7f0e", "#1f77b4", "#2ca02c", "#8800ff", "#808080", "#0D98BA", "#40E0D0", "#5A5A5A", "#000000", "#FF00FF", "#90EE90", "#000080", "#964B00", "#0096FF", "#FFD700", "#ADD8E6", "#023020", "#C4A484", "#FFFF00", "#00CCFF", "#D3D3D3", "#8B0000", "#5C4033", "#ffcccb", "#3399CC", "#0099CC", "#6666CC"])'
+
+## "999000"
+
+
+```
+
+
+```{r}
+links$group <- "bc2"
+
+for (i in 1:nrow(links)){
+  if ((links$target[i] == 8)
+      | (links$target[i] == 20)  | (links$target[i] == 38)
+      | (links$target[i] == 70) | (links$target[i] == 89)
+      | (links$target[i] == 120)
+     ){ 
+    links$group[i] = "red-orange"
+  }
+  if ((links$target[i] == 48)| (links$target[i] == 69) # also 28
+      | (links$target[i] == 99)| (links$target[i]==133)
+      ){ 
+    links$group[i] = "orange"
+  }
+  if ((links$target[i] == 6) | (links$target[i] == 19)
+      | (links$target[i] == 30) | (links$target[i]==39)| (links$target[i]==54)| (links$target[i]==73)
+      | (links$target[i]==76)  | (links$target[i]==87)
+      | (links$target[i]==131)  | (links$target[i]==118)
+      | (links$target[i]==107)  | (links$target[i]==77)
+      ){
+    links$group[i] = "violet"
+  }
+  if ((links$target[i] == 10)| (links$target[i] == 24) 
+      | (links$target[i] == 41)| (links$target[i] == 63)| (links$target[i]==84) | (links$target[i]==114)
+      | (links$target[i]==139)
+      ){
+    links$group[i] = "green"
+  }
+  if ((links$target[i] == 14)| (links$target[i] == 27)
+      | (links$target[i]==49) | (links$target[i] == 67) | (links$target[i]==85) | (links$target[i]==115)  
+      ){ 
+    links$group[i] = "blue"
+  }
+  if ((links$target[i] == 7)| (links$target[i] == 21) # also 8
+      | (links$target[i] == 56)| (links$target[i]==58)
+      | (links$target[i]==100)  | (links$target[i]==94)
+      | (links$target[i]==117)  | (links$target[i]==134)
+      | (links$target[i]==126)
+      ){
+    links$group[i] = "gray"
+  }
+  if ((links$target[i] == 23)| (links$target[i] == 40)  #also 11?
+      | (links$target[i] == 74) | (links$target[i]==88)| (links$target[i]==119)
+      ){
+    links$group[i] = "darkblue"
+  }
+    if ((links$target[i] == 68)| (links$target[i] == 102)
+        | (links$target[i] == 135)
+        ){
+    links$group[i] = "magenta"
+  }
+    if ((links$target[i] == 29)| (links$target[i] == 47)
+        | (links$target[i] == 71)
+        ){
+    links$group[i] = "darkgray"
+  }
+    if ((links$target[i] == 28)| (links$target[i] == 45) 
+        | (links$target[i] == 57)| (links$target[i]==95)
+        | (links$target[i]==127) | (links$target[i]==124)
+        ){
+    links$group[i] = "black"
+    }
+#
+    if ((links$target[i] == 5)| (links$target[i] == 15)
+        | (links$target[i] == 36)|  (links$target[i] == 34) | (links$target[i] == 55) | (links$target[i]==91)| (links$target[i]==123)
+        ){
+   links$group[i] = "brown"
+    }
+#
+    if ((links$target[i] == 9) | (links$target[i] == 22) 
+        | (links$target[i] == 37) | (links$target[i]==64)
+        | (links$target[i] == 104) | (links$target[i]==78)
+        | (links$target[i] == 108) | (links$target[i]==138)
+        )
+        {
+    links$group[i] = "red"
+  }
+#     if ((links$target[i] == 26) | (links$target[i]==33)
+#         | (links$target[i]==18)  | (links$target[i]==13)
+#         | (links$target[i]==42)  | (links$target[i]==44)
+#         | (links$target[i]==43)  | (links$target[i]==61)
+#         | (links$target[i]==65)  | (links$target[i]==75)
+#         | (links$target[i]==92)  | (links$target[i]==103)
+#         | (links$target[i]==110)  | (links$target[i]==116)
+#         | (links$target[i]==130)  | (links$target[i]==105)
+#         | (links$target[i]==137)  
+#         ){
+#   links$group[i] = "lightblue"
+#    }
+       if ((links$target[i] == 13) | (links$target[i]==44)
+         | (links$target[i]==65)  | (links$target[i]==75)
+         | (links$target[i]==92)  | (links$target[i]==103)
+         | (links$target[i]==110)  | (links$target[i]==105)
+         | (links$target[i]==130)  | (links$target[i]==137)
+         ){
+   links$group[i] = "lightblue"
+    }
+     if ((links$target[i] == 31) | (links$target[i]==52) 
+         | (links$target[i]==83) | (links$target[i]==113) 
+         ){
+   links$group[i] = "darkgreen"
+     }
+  #if ((links$target[i] == 66) | (links$target[i]==80) 
+  #       ){
+  # links$group[i] = "royalblue"
+  #   }
+  if ((links$target[i] == 33) | (links$target[i]==42)
+      | (links$target[i]==18)  | (links$target[i]==26)
+         ){
+   links$group[i] = "royalblue"
+     }
+  if ((links$target[i] == 43) | (links$target[i]==66)
+         ){
+   links$group[i] = "teal"
+     }
+  if ((links$target[i]==80)
+         ){
+   links$group[i] = "bluepurple"
+  }
+    if ((links$target[i] == 116)
+         ){
+   links$group[i] = "bluegray"
+     }
+  
+      if ( (links$target[i] == 11) 
+        | (links$target[i]==12)  ## also 5, 17
+        # (links$target[i] == 13) | (links$target[i]==18) ## transfered 13 and 18 to light blue
+        ){
+    links$group[i] = "yellow"
+    }
+    if ((links$target[i] == 25)| (links$target[i]==72)
+        | (links$target[i]==90)  | (links$target[i]==121)
+        #| (links$target[i]==84))
+        ){
+   links$group[i] = "lightgreen"
+       }
+    if ((links$target[i]==17) | (links$target[i]==60)
+        | (links$target[i]==50)  | (links$target[i]==79)
+        | (links$target[i]==93)  | (links$target[i]==109)
+        | (links$target[i]==15)
+        ){
+   links$group[i] = "gold"
+         }
+    if ((links$target[i]==101)| (links$target[i]==136)){
+   links$group[i] = "lightgray"
+    }
+  if ((links$target[i]==16) | (links$target[i]==32)
+      | (links$target[i]==51) # also 76 and 131
+      ){
+   links$group[i] = "lightbrown"
+  }
+    if ((links$target[i]==53)| (links$target[i]==86)
+        | (links$target[i]==122)) ## also 20
+      {
+   links$group[i] = "skyblue"
+  }
+   if ((links$target[i]==46)| (links$target[i]== 62) ## also 40, 69, 99, 102, 133
+       | (links$target[i]== 81)  | (links$target[i]== 111)
+       ){
+   links$group[i] = "darkred"
+   }
+    if ((links$target[i]==15) | (links$target[i]==34)){
+   links$group[i] = "darkbrown"
+    }
+      if ((links$target[i]==98) | (links$target[i]==129))  ## also 28, 29, 62, 71, 81, 111
+        {
+   links$group[i] = "lightred"
+      }
+  if ((links$target[i]==96) | (links$target[i]==128)){
+   links$group[i] = "bc"
+    }
+}  
+#}
+
+
+
+```
+
+
+```{r}
+nodes["nodeID"] <- ""
+C9snRNAseq_InhibitoryNeurons_sankeydiagram <- sankeyNetwork(Links = links, Nodes = nodes, Source = 'source',
+                                        Target = 'target', Value = 'value', NodeID = 'nodeID',#,
+                                        colourScale = colorgroups, NodeGroup="group",
+                                        LinkGroup = "group")
+
+saveNetwork(C9snRNAseq_InhibitoryNeurons_sankeydiagram, '091523_C9snRNAseq_InhibitoryNeurons_sankeydiagram5to30.html',selfcontained=TRUE)
+
+
+
+```
+
+```{r}
+C9snRNAseq_InhibitoryNeurons_sankeydiagram
+```
